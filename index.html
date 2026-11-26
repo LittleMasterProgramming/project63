@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personalized Career Path Simulator</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              900: '#0c4a6e',
+            },
+            mint: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-mono { font-family: 'IBM Plex Mono', monospace; }
+    .tabular-nums { font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased min-h-screen flex flex-col selection:bg-teal-900 selection:text-teal-200">
+
+  <!-- Fixed Top Navigation Bar with 3 Distinct Tabs -->
+  <header class="sticky top-0 z-50 bg-slate-950/90 backdrop-blur border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <!-- Zone 1: Single Wordmark Brand -->
+      <div class="flex items-center gap-2.5 shrink-0">
+        <div class="w-8 h-8 rounded-lg bg-sky-500 text-slate-950 flex items-center justify-center font-bold">
+          <svg class="w-5 h-5 text-slate-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+        </div>
+        <span class="text-lg font-bold text-white tracking-tight whitespace-nowrap">CareerPath Simulator</span>
+      </div>
+
+      <!-- Zone 2: 3 Distinct Tabs -->
+      <nav class="flex items-center bg-slate-900 border border-slate-800 p-1 rounded-xl">
+        <button id="tabBtn1" onclick="switchTab(1)" class="tab-btn px-4 py-2 text-xs md:text-sm font-semibold rounded-lg transition-all whitespace-nowrap bg-slate-800 text-white shadow-xs">
+          1. Profile & Starting Point
+        </button>
+        <button id="tabBtn2" onclick="switchTab(2)" class="tab-btn px-4 py-2 text-xs md:text-sm font-medium rounded-lg transition-all whitespace-nowrap text-slate-400 hover:text-slate-100">
+          2. Path Simulator
+        </button>
+        <button id="tabBtn3" onclick="switchTab(3)" class="tab-btn px-4 py-2 text-xs md:text-sm font-medium rounded-lg transition-all whitespace-nowrap text-slate-400 hover:text-slate-100">
+          3. Actionable Roadmap
+        </button>
+      </nav>
+
+      <!-- Zone 3: Primary Action -->
+      <div class="shrink-0 hidden sm:block">
+        <button onclick="switchTab(2)" class="px-4 py-2 text-xs font-semibold text-slate-950 bg-sky-400 hover:bg-sky-300 rounded-lg transition-colors whitespace-nowrap">
+          Run Simulation
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Viewport -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- TAB 1: Profile & Starting Point -->
+    <section id="tabContent1" class="tab-content block">
+      <div class="max-w-3xl mx-auto">
+        <div class="mb-8">
+          <h1 class="text-3xl font-extrabold text-white tracking-tight">Define Your Career Baseline</h1>
+          <p class="text-slate-400 mt-2 text-base">Configure your current educational background and aspirational role to seed the dynamic path model.</p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm space-y-6">
+          <!-- Education Level -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-200 mb-2">Current Education Level</label>
+            <select id="educationSelect" onchange="updateProfile()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500">
+              <option value="high_school">High School Diploma / GED</option>
+              <option value="some_college">Some College / Associate Credits</option>
+              <option value="bachelors_non_stem" selected>Bachelor's Degree (Non-STEM)</option>
+              <option value="bachelors_stem_cs">Bachelor's Degree (STEM / Computer Science)</option>
+              <option value="masters_phd">Master's or Advanced Degree</option>
+              <option value="career_switcher">Career Switcher (3+ Years Professional Experience)</option>
+            </select>
+          </div>
+
+          <!-- Field of Interest -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-200 mb-2">Field of Interest</label>
+            <select id="fieldSelect" onchange="onFieldChange()" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500">
+              <option value="software_engineering" selected>Software Engineering (Full-Stack & Systems)</option>
+              <option value="cloud_devops">Cloud & DevOps Engineering</option>
+              <option value="data_ai">Data Science & AI Systems</option>
+              <option value="cybersecurity">Cybersecurity & Information Assurance</option>
+              <option value="ui_ux">UI/UX & Product Design</option>
+              <option value="product_mgmt">Product Management & Tech Strategy</option>
+            </select>
+          </div>
+
+          <!-- Target Career Goal -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-200 mb-2">Target Career Goal (Role)</label>
+            <input id="targetGoalInput" type="text" value="Junior Full-Stack Developer" placeholder="e.g. Junior Full-Stack Developer, Cloud Architect" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+            <div id="roleSuggestions" class="mt-2 flex flex-wrap gap-2 text-xs text-slate-400"></div>
+          </div>
+
+          <!-- Time Commitment -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-200 mb-2">Weekly Study Commitment</label>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <label class="border border-slate-800 bg-slate-950/60 rounded-xl p-3 flex flex-col cursor-pointer hover:border-slate-700 has-[:checked]:border-sky-500 has-[:checked]:bg-sky-950/40">
+                <input type="radio" name="commitment" value="part_time" class="hidden" onchange="updateProfile()" />
+                <span class="text-sm font-semibold text-slate-200">Part-Time</span>
+                <span class="text-xs text-slate-400 mt-1">12-18 hrs/week</span>
+              </label>
+              <label class="border border-slate-800 bg-slate-950/60 rounded-xl p-3 flex flex-col cursor-pointer hover:border-slate-700 has-[:checked]:border-sky-500 has-[:checked]:bg-sky-950/40">
+                <input type="radio" name="commitment" value="moderate" class="hidden" checked onchange="updateProfile()" />
+                <span class="text-sm font-semibold text-slate-200">Semi-Intensive</span>
+                <span class="text-xs text-slate-400 mt-1">20-30 hrs/week</span>
+              </label>
+              <label class="border border-slate-800 bg-slate-950/60 rounded-xl p-3 flex flex-col cursor-pointer hover:border-slate-700 has-[:checked]:border-sky-500 has-[:checked]:bg-sky-950/40">
+                <input type="radio" name="commitment" value="full_time" class="hidden" onchange="updateProfile()" />
+                <span class="text-sm font-semibold text-slate-200">Full-Time Sprint</span>
+                <span class="text-xs text-slate-400 mt-1">40+ hrs/week</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- CTA Button -->
+          <div class="pt-4 border-t border-slate-800 flex justify-end">
+            <button onclick="startSimulationFromTab1()" class="w-full sm:w-auto px-6 py-3.5 bg-sky-500 hover:bg-sky-400 text-slate-950 text-sm font-bold rounded-xl shadow-xs transition-all flex items-center justify-center gap-2">
+              <span>Start Simulation</span>
+              <svg class="w-4 h-4 text-slate-950" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: Path Simulator -->
+    <section id="tabContent2" class="tab-content hidden">
+      <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-white">Career Pathway Engine</h1>
+          <p class="text-sm text-slate-400 mt-1">Toggle learning pathways and credentials to observe real-time projected outcomes.</p>
+        </div>
+        <button onclick="switchTab(3)" class="self-start sm:self-auto px-4 py-2 bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs font-bold rounded-lg shadow-xs transition-colors flex items-center gap-2">
+          <span>View Actionable Roadmap</span>
+          <svg class="w-4 h-4 text-slate-950" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        </button>
+      </div>
+
+      <!-- Core Simulator Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Controls Column (Left, 7 Cols) -->
+        <div class="lg:col-span-7 space-y-6">
+          
+          <!-- Primary Route Selection -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm">
+            <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider mb-4">1. Primary Learning Pathway</h2>
+            <div class="grid grid-cols-1 gap-3" id="routeContainer">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Toggles & High-Impact Credentials -->
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider">2. Strategic Accelerators & Credentials</h2>
+              <span class="text-xs text-slate-400">Select any to recalculate</span>
+            </div>
+            <div class="space-y-3" id="addonsContainer">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Real-Time Simulated Metrics (Right, 5 Cols) -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="sticky top-24 space-y-4">
+            
+            <!-- Metric 1: Starting Salary -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm relative overflow-hidden">
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                <span>Estimated Starting Salary</span>
+                <span class="text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-800/70 px-2 py-0.5 rounded">Annual Median</span>
+              </div>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="metricSalary" class="text-4xl font-extrabold text-white font-mono tabular-nums">$92,000</span>
+                <span class="text-xs text-slate-400">USD/yr</span>
+              </div>
+              <div class="mt-3 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800 pt-3 font-mono">
+                <span>Range: <strong id="metricSalaryRange" class="text-slate-200">$81k – $106k</strong></span>
+                <span class="text-emerald-400 font-semibold">+ Market Competitive</span>
+              </div>
+            </div>
+
+            <!-- Metric 2: Time to Employment -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm">
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                <span>Time to Employment</span>
+                <span class="text-sky-400 bg-sky-950/60 border border-sky-800/70 px-2 py-0.5 rounded">Study + Search</span>
+              </div>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="metricTime" class="text-4xl font-extrabold text-white font-mono tabular-nums">7.5</span>
+                <span class="text-base font-semibold text-slate-400">months</span>
+              </div>
+              <div class="mt-3 text-xs text-slate-400 border-t border-slate-800 pt-3 flex justify-between">
+                <span>Preparation: <strong id="metricLearningTime" class="text-slate-200">5.5 mos</strong></span>
+                <span>Search Runway: <strong id="metricSearchRunway" class="text-slate-200">2.0 mos</strong></span>
+              </div>
+            </div>
+
+            <!-- Metric 3: Skill Match % -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm">
+              <div class="flex items-center justify-between text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                <span>Target Skill Match</span>
+                <span id="metricSkillPct" class="text-emerald-400 font-bold font-mono">84%</span>
+              </div>
+              <div class="mt-2 w-full bg-slate-800 rounded-full h-3 overflow-hidden">
+                <div id="metricSkillBar" class="bg-emerald-400 h-3 rounded-full transition-all duration-300" style="width: 84%"></div>
+              </div>
+              <div class="mt-4 grid grid-cols-2 gap-2 text-xs border-t border-slate-800 pt-3">
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Tech Foundation:</span>
+                  <strong id="barTech" class="font-mono text-slate-200">82%</strong>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Architecture:</span>
+                  <strong id="barArch" class="font-mono text-slate-200">78%</strong>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Cloud & Tools:</span>
+                  <strong id="barCloud" class="font-mono text-slate-200">86%</strong>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Interview Prep:</span>
+                  <strong id="barInterview" class="font-mono text-slate-200">76%</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Metric 4: Investment & Offer Odds -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <span class="block text-xs font-semibold text-slate-400 uppercase">Estimated Cost</span>
+                  <span id="metricCost" class="text-2xl font-bold text-white font-mono mt-1 block">$14,850</span>
+                  <span class="text-xs text-slate-400">Tuition & resources</span>
+                </div>
+                <div>
+                  <span class="block text-xs font-semibold text-slate-400 uppercase">6-Mo Offer Odds</span>
+                  <span id="metricOfferOdds" class="text-2xl font-bold text-emerald-400 font-mono mt-1 block">85%</span>
+                  <span class="text-xs text-slate-400">Based on cohort data</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 3: Actionable Roadmap -->
+    <section id="tabContent3" class="tab-content hidden">
+      <div class="max-w-4xl mx-auto">
+        <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-white">Personalized Actionable Roadmap</h1>
+            <p class="text-sm text-slate-400 mt-1">Dynamic milestone checklist generated from your simulator pathway and selected add-ons.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="copyRoadmapMarkdown()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 border border-slate-700">
+              <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+              <span>Copy Checklist</span>
+            </button>
+            <button onclick="window.print()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 border border-slate-700">
+              <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+              <span>Print Roadmap</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Roadmap Progress Summary -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm mb-6">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-semibold text-slate-200">Milestone Completion Progress</span>
+            <span id="roadmapProgressPct" class="text-sm font-bold text-sky-400 font-mono">18%</span>
+          </div>
+          <div class="w-full bg-slate-800 rounded-full h-3 overflow-hidden">
+            <div id="roadmapProgressBar" class="bg-sky-500 h-3 rounded-full transition-all duration-300" style="width: 18%"></div>
+          </div>
+          <div class="mt-3 flex items-center justify-between text-xs text-slate-400">
+            <span id="roadmapCountText">2 of 11 milestones completed</span>
+            <span>Check off milestones as you achieve them</span>
+          </div>
+        </div>
+
+        <!-- Milestones Container -->
+        <div id="milestonesList" class="space-y-6">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-slate-950 border-t border-slate-800 py-6 text-center text-xs text-slate-500">
+    <p>Personalized Career Path Simulator · Dark Mode Edition · Built with client-side reactive modeling</p>
+  </footer>
+
+  <!-- Embedded Vanilla JavaScript Engine -->
+  <script>
+    // State
+    const state = {
+      profile: {
+        educationLevel: 'bachelors_non_stem',
+        fieldOfInterest: 'software_engineering',
+        targetCareerGoal: 'Junior Full-Stack Developer',
+        commitment: 'moderate'
+      },
+      currentRouteId: 'bootcamp_intensive',
+      activeAddonIds: ['aws_cert', 'production_portfolio'],
+      milestones: []
+    };
+
+    const routes = [
+      { id: 'bootcamp_intensive', name: 'Intensive Coding Bootcamp', desc: '16-24 week applied software accelerator focused on modern stack and hiring pipelines.', baseDuration: 5, cost: 14500, match: 80, mult: 0.98 },
+      { id: 'university_4yr', name: '4-Year University CS Degree', desc: 'Comprehensive theoretical foundation in algorithms, OS, and accredited credentialing.', baseDuration: 48, cost: 48000, match: 76, mult: 1.14 },
+      { id: 'self_taught', name: 'Self-Taught / Open Courseware', desc: 'Autonomous curriculum via curated open-source projects, documentation, and tutorials.', baseDuration: 11, cost: 450, match: 69, mult: 0.92 },
+      { id: 'community_college', name: 'Community College Associate', desc: 'Affordable collegiate track with options for direct junior hire or university transfer.', baseDuration: 24, cost: 8200, match: 72, mult: 1.02 },
+      { id: 'apprenticeship', name: 'Paid Tech Apprenticeship', desc: 'Earn-while-you-learn corporate cohort pairing hands-on mentorship with a starting salary.', baseDuration: 12, cost: 0, match: 87, mult: 1.06 }
+    ];
+
+    const addons = [
+      { id: 'aws_cert', name: 'AWS / Cloud Certification', desc: 'Solutions Architect Associate or GCP Engineer', salary: 7500, time: 1.5, match: 9, cost: 350 },
+      { id: 'production_portfolio', name: '3 Production-Grade Web Apps', desc: 'Full-stack applications with auth, CI/CD, and databases', salary: 6000, time: 2.0, match: 12, cost: 60 },
+      { id: 'internship_experience', name: 'Tech Internship / Co-op', desc: '3-6 months hands-on experience in sprint teams', salary: 10500, time: 3.5, match: 15, cost: 0 },
+      { id: 'open_source', name: 'Open-Source Contributions', desc: 'Merged pull requests in reputable GitHub projects', salary: 4500, time: 1.0, match: 7, cost: 0 },
+      { id: 'leetcode_algorithms', name: 'Algorithms & LeetCode Sprint', desc: '150+ solved algorithmic problems & system design', salary: 8500, time: 1.5, match: 10, cost: 150 },
+      { id: 'industry_mentorship', name: '1-on-1 Senior Tech Mentor', desc: 'Weekly architectural feedback and mock interviews', salary: 5000, time: -0.8, match: 8, cost: 500 }
+    ];
+
+    function switchTab(tabIndex) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-slate-800', 'text-white', 'shadow-xs');
+        btn.classList.add('text-slate-400');
+      });
+
+      const activeSection = document.getElementById('tabContent' + tabIndex);
+      const activeBtn = document.getElementById('tabBtn' + tabIndex);
+      if (activeSection) activeSection.classList.remove('hidden');
+      if (activeBtn) {
+        activeBtn.classList.add('bg-slate-800', 'text-white', 'shadow-xs');
+        activeBtn.classList.remove('text-slate-400');
+      }
+      if (tabIndex === 3) renderRoadmap();
+    }
+
+    function startSimulationFromTab1() {
+      updateProfile();
+      switchTab(2);
+    }
+
+    function updateProfile() {
+      state.profile.educationLevel = document.getElementById('educationSelect').value;
+      state.profile.fieldOfInterest = document.getElementById('fieldSelect').value;
+      state.profile.targetCareerGoal = document.getElementById('targetGoalInput').value;
+      const checkedCommitment = document.querySelector('input[name="commitment"]:checked');
+      if (checkedCommitment) state.profile.commitment = checkedCommitment.value;
+      recalculate();
+    }
+
+    function onFieldChange() {
+      const field = document.getElementById('fieldSelect').value;
+      const goalInput = document.getElementById('targetGoalInput');
+      const suggestions = {
+        software_engineering: ['Junior Full-Stack Developer', 'Frontend Engineer', 'Backend API Specialist'],
+        cloud_devops: ['Cloud Operations Associate', 'Junior DevOps Engineer', 'Site Reliability Engineer'],
+        data_ai: ['Associate ML Engineer', 'Junior Data Scientist', 'AI Applications Developer'],
+        cybersecurity: ['Junior SOC Analyst', 'Information Security Specialist', 'Penetration Tester'],
+        ui_ux: ['Product Designer (UI/UX)', 'Design Systems Engineer', 'Frontend UI Engineer'],
+        product_mgmt: ['Associate Product Manager (APM)', 'Technical Product Analyst']
+      };
+
+      const list = suggestions[field] || suggestions.software_engineering;
+      goalInput.value = list[0];
+      const container = document.getElementById('roleSuggestions');
+      container.innerHTML = 'Popular: ' + list.map(r => '<button type="button" onclick="setRole(\\'' + r + '\\')" class="underline hover:text-sky-400">' + r + '</button>').join(', ');
+      updateProfile();
+    }
+
+    function setRole(r) {
+      document.getElementById('targetGoalInput').value = r;
+      updateProfile();
+    }
+
+    function selectRoute(id) {
+      state.currentRouteId = id;
+      renderRoutes();
+      recalculate();
+    }
+
+    function toggleAddon(id) {
+      if (state.activeAddonIds.includes(id)) {
+        state.activeAddonIds = state.activeAddonIds.filter(x => x !== id);
+      } else {
+        state.activeAddonIds.push(id);
+      }
+      renderAddons();
+      recalculate();
+    }
+
+    function renderRoutes() {
+      const container = document.getElementById('routeContainer');
+      container.innerHTML = routes.map(r => {
+        const isSelected = r.id === state.currentRouteId;
+        return `
+          <div onclick="selectRoute('${r.id}')" class="cursor-pointer border rounded-xl p-4 transition-all ${isSelected ? 'border-sky-500 bg-sky-950/40 ring-1 ring-sky-500' : 'border-slate-800 hover:border-slate-700 bg-slate-950/50'}">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <input type="radio" name="routeRadio" ${isSelected ? 'checked' : ''} class="w-4 h-4 text-sky-500 bg-slate-900 border-slate-700" />
+                <span class="text-sm font-bold text-slate-100">${r.name}</span>
+              </div>
+              <span class="text-xs font-mono font-medium text-slate-400">${r.baseDuration} mos · $${r.cost.toLocaleString()}</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-2 pl-7">${r.desc}</p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderAddons() {
+      const container = document.getElementById('addonsContainer');
+      container.innerHTML = addons.map(a => {
+        const isActive = state.activeAddonIds.includes(a.id);
+        return `
+          <label class="flex items-start gap-3 p-3.5 border rounded-xl cursor-pointer transition-all ${isActive ? 'border-emerald-500/70 bg-emerald-950/30' : 'border-slate-800 hover:border-slate-700 bg-slate-950/50'}">
+            <input type="checkbox" onchange="toggleAddon('${a.id}')" ${isActive ? 'checked' : ''} class="mt-1 w-4 h-4 text-emerald-500 rounded bg-slate-900 border-slate-700" />
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-semibold text-slate-100">${a.name}</span>
+                <span class="text-xs font-mono font-semibold text-emerald-400">+$${a.salary.toLocaleString()}/yr</span>
+              </div>
+              <p class="text-xs text-slate-400 mt-0.5">${a.desc}</p>
+            </div>
+          </label>
+        `;
+      }).join('');
+    }
+
+    function recalculate() {
+      const route = routes.find(r => r.id === state.currentRouteId) || routes[0];
+      const active = addons.filter(a => state.activeAddonIds.includes(a.id));
+
+      let baseSalary = 85000;
+      if (state.profile.educationLevel === 'bachelors_stem_cs') baseSalary += 6000;
+      else if (state.profile.educationLevel === 'masters_phd') baseSalary += 9000;
+      
+      const routeBaseSalary = baseSalary * route.mult;
+      const addonBoost = active.reduce((sum, a) => sum + a.salary, 0);
+      const medianSalary = Math.round(routeBaseSalary + addonBoost);
+      const minSalary = Math.round(medianSalary * 0.88);
+      const maxSalary = Math.round(medianSalary * 1.15);
+
+      let learningTime = route.baseDuration;
+      if (state.profile.commitment === 'part_time') learningTime *= 1.35;
+      const addonTime = active.reduce((sum, a) => sum + a.time, 0);
+      learningTime = Math.max(3, Math.round((learningTime + addonTime) * 10) / 10);
+      const searchRunway = 2.5;
+      const totalTime = Math.round((learningTime + searchRunway) * 10) / 10;
+
+      const baseMatch = route.match;
+      const addonMatch = active.reduce((sum, a) => sum + a.match, 0);
+      const finalMatch = Math.min(98, baseMatch + addonMatch);
+
+      const totalCost = route.cost + active.reduce((sum, a) => sum + a.cost, 0);
+      const offerOdds = Math.min(96, Math.max(40, 55 + (route.id === 'university_4yr' ? 20 : 15) + active.length * 4));
+
+      // DOM Updates
+      document.getElementById('metricSalary').textContent = '$' + medianSalary.toLocaleString();
+      document.getElementById('metricSalaryRange').textContent = '$' + Math.round(minSalary/1000) + 'k – $' + Math.round(maxSalary/1000) + 'k';
+      document.getElementById('metricTime').textContent = totalTime;
+      document.getElementById('metricLearningTime').textContent = learningTime + ' mos';
+      document.getElementById('metricSearchRunway').textContent = searchRunway + ' mos';
+      document.getElementById('metricSkillPct').textContent = finalMatch + '%';
+      document.getElementById('metricSkillBar').style.width = finalMatch + '%';
+      document.getElementById('metricCost').textContent = '$' + totalCost.toLocaleString();
+      document.getElementById('metricOfferOdds').textContent = offerOdds + '%';
+
+      document.getElementById('barTech').textContent = Math.min(99, finalMatch + 2) + '%';
+      document.getElementById('barArch').textContent = Math.min(95, finalMatch - 4) + '%';
+      document.getElementById('barCloud').textContent = Math.min(98, 70 + (state.activeAddonIds.includes('aws_cert') ? 22 : 0)) + '%';
+      document.getElementById('barInterview').textContent = Math.min(95, 65 + (state.activeAddonIds.includes('leetcode_algorithms') ? 20 : 5)) + '%';
+
+      buildMilestonesList();
+    }
+
+    function buildMilestonesList() {
+      state.milestones = [
+        { id: 'm1', phase: 'Phase 1: Foundations', title: 'Modern Dev Environment & Git Flow', desc: 'Setup terminal, VS Code, Git CLI, SSH, and GitHub branch hygiene.', done: true },
+        { id: 'm2', phase: 'Phase 1: Foundations', title: 'Core Programming & Data Structures', desc: 'Object-oriented and functional paradigms, algorithms, and modular design.', done: true },
+        { id: 'm3', phase: 'Phase 2: Applied Engineering', title: 'Full-Stack Web APIs & Database Schemas', desc: 'PostgreSQL relational tables, ORM queries, and REST endpoint security.', done: false },
+        { id: 'm4', phase: 'Phase 2: Applied Engineering', title: 'Reactive Frontend Components & State', desc: 'Component composition, responsive views, and client data fetching.', done: false }
+      ];
+
+      if (state.activeAddonIds.includes('production_portfolio')) {
+        state.milestones.push({ id: 'm5', phase: 'Phase 3: Portfolio', title: 'Signature App 1: SaaS with Auth & Database', desc: 'End-to-end multi-tenant application with CI/CD and deployment.', done: false });
+        state.milestones.push({ id: 'm6', phase: 'Phase 3: Portfolio', title: 'Signature App 2: Real-time Event System', desc: 'WebSocket or streaming event pipeline with automated tests.', done: false });
+      }
+
+      if (state.activeAddonIds.includes('aws_cert')) {
+        state.milestones.push({ id: 'm7', phase: 'Phase 4: Credentialing', title: 'AWS Solutions Architect Associate Exam', desc: 'Complete practice exams with 85%+ score and pass proctored exam.', done: false });
+      }
+
+      if (state.activeAddonIds.includes('leetcode_algorithms')) {
+        state.milestones.push({ id: 'm8', phase: 'Phase 4: Credentialing', title: 'Solve 150+ LeetCode Data Structure Problems', desc: 'Master NeetCode 150 patterns across trees, graphs, and dynamic programming.', done: false });
+      }
+
+      state.milestones.push({ id: 'm9', phase: 'Phase 5: Job Search', title: 'ATS-Optimized Tech Resume & LinkedIn Overhaul', desc: 'Bullet points framed with XYZ metrics and verified ATS readability.', done: false });
+      state.milestones.push({ id: 'm10', phase: 'Phase 5: Job Search', title: 'Targeted Outreach & Referral Sprint', desc: '15-20 applications per week with direct engineering manager reachouts.', done: false });
+      state.milestones.push({ id: 'm11', phase: 'Phase 5: Job Search', title: 'Technical Screen Sprints & Offer Negotiation', desc: 'Live coding interviews, system design rounds, and compensation closing.', done: false });
+    }
+
+    function renderRoadmap() {
+      const container = document.getElementById('milestonesList');
+      const completed = state.milestones.filter(m => m.done).length;
+      const total = state.milestones.length;
+      const pct = Math.round((completed / total) * 100);
+
+      document.getElementById('roadmapProgressPct').textContent = pct + '%';
+      document.getElementById('roadmapProgressBar').style.width = pct + '%';
+      document.getElementById('roadmapCountText').textContent = completed + ' of ' + total + ' milestones completed';
+
+      // Group by phase
+      const phases = {};
+      state.milestones.forEach(m => {
+        if (!phases[m.phase]) phases[m.phase] = [];
+        phases[m.phase].push(m);
+      });
+
+      let html = '';
+      for (const [phaseTitle, items] of Object.entries(phases)) {
+        html += `
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider mb-4 border-b border-slate-800 pb-2">${phaseTitle}</h3>
+            <div class="space-y-3">
+              ${items.map(item => `
+                <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-800 hover:bg-slate-800/40 cursor-pointer transition-colors ${item.done ? 'bg-emerald-950/20 border-emerald-900/50' : ''}">
+                  <input type="checkbox" onchange="toggleMilestone('${item.id}')" ${item.done ? 'checked' : ''} class="mt-1 w-4 h-4 text-sky-500 rounded bg-slate-900 border-slate-700" />
+                  <div class="flex-1">
+                    <span class="text-sm font-semibold ${item.done ? 'line-through text-slate-500' : 'text-slate-100'}">${item.title}</span>
+                    <p class="text-xs text-slate-400 mt-0.5">${item.desc}</p>
+                  </div>
+                </label>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+      container.innerHTML = html;
+    }
+
+    function toggleMilestone(id) {
+      const item = state.milestones.find(m => m.id === id);
+      if (item) item.done = !item.done;
+      renderRoadmap();
+    }
+
+    function copyRoadmapMarkdown() {
+      const text = '# Career Roadmap: ' + state.profile.targetCareerGoal + '\n\n' + 
+        state.milestones.map(m => '- [' + (m.done ? 'x' : ' ') + '] ' + m.title + ': ' + m.desc).join('\n');
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Checklist copied to clipboard as Markdown!');
+      });
+    }
+
+    // Initialize
+    onFieldChange();
+    renderRoutes();
+    renderAddons();
+    recalculate();
+  </script>
+</body>
+</html>
